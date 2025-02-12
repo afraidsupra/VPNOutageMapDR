@@ -139,7 +139,7 @@ def checkJSON(JSONStatus, killThreads, activateAlert):
         if UpdateLatency.seconds < 600:
             activateAlert.clear()
             JSONStatus.clear()
-        time.sleep(30) # I need to add a way to interrupt this sleep, otherwise it delays the shutdown
+        killThreads.wait(60)
     return
 
 def manualJSONRefresh(killThreads, manualJSONCopy):
