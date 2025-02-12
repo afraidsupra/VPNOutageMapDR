@@ -1,6 +1,6 @@
 import boto3, os, logging, time, threading, requests, json
 from discord_webhook import DiscordWebhook  # this will be replaced by a ServiceNow webhook
-from datetime import datetime
+from datetime import datetime, timedelta
 from threading import Event
 from dotenv import dotenv_values
 
@@ -129,14 +129,14 @@ def checkJSON(JSONStatus, killThreads, activateAlert):
         processRefreshTime = rawRefreshTime.replace('T', ' ')
         JSONRefreshTime = datetime.strptime(processRefreshTime, '%Y-%m-%d %H:%M:%S')
 
-        WriteTime = datetime.now()
+        WriteTime = datetime.utcnow() + timedelta(hours = 11)
         UpdateLatency = WriteTime - JSONRefreshTime
         logging.info(f'[INFO] Current Latency: {UpdateLatency.seconds}')
-        if UpdateLatency.seconds > 80:
+        if UpdateLatency.seconds > 600:
             logging.info(f'[ALERT] JSON stale, alerting.')
             activateAlert.set()
             JSONStatus.set()
-        if UpdateLatency.seconds < 80:
+        if UpdateLatency.seconds < 600:
             activateAlert.clear()
             JSONStatus.clear()
         time.sleep(30) # I need to add a way to interrupt this sleep, otherwise it delays the shutdown
